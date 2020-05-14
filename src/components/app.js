@@ -21,6 +21,7 @@ export default class App extends Component {
     name: '',
     number: '',
     notification: false,
+    localStorageUpdate: false,
   };
   handleChange = ({ target }) => {
     const { name, value } = target;
@@ -35,11 +36,7 @@ export default class App extends Component {
           this.state.name.toLocaleLowerCase(),
       )
     ) {
-      console.log(this.state.notification);
-
       this.setState({ notification: true });
-      console.log(this.state.notification);
-
       setTimeout(() => this.setState({ notification: false }), 2000);
     } else {
       this.setState(prevState => {
@@ -61,7 +58,10 @@ export default class App extends Component {
   componentDidMount() {
     const persistadContacts = localStorage.getItem('contacts');
     if (persistadContacts) {
-      this.setState({ contacts: JSON.parse(persistadContacts) });
+      this.setState({
+        contacts: JSON.parse(persistadContacts),
+        localStorageUpdate: true,
+      });
     }
   }
   componentDidUpdate(prevState, prevProps) {
@@ -77,6 +77,7 @@ export default class App extends Component {
   render() {
     const lengthCont = this.state.contacts.length > 1;
     const notification = this.state.notification;
+    const localStorageUpdate = this.state.localStorageUpdate;
     return (
       <>
         <Wrapper tittle="Phonebook">
@@ -103,8 +104,9 @@ export default class App extends Component {
         >
           <Filter state={this.state} handleChange={this.handleChange} />
         </CSSTransition>
-
-        <ContactsList state={this.state} deleteContact={this.deleteContact} />
+        {localStorageUpdate && (
+          <ContactsList state={this.state} deleteContact={this.deleteContact} />
+        )}
       </>
     );
   }
